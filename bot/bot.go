@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	
@@ -13,9 +12,7 @@ import (
 )
 
 func Run() {
-	app_config := config.New()
-
-	discord, err := discordgo.New(app_config.BotToken)
+	discord, err := discordgo.New(config.AppConfig.BotToken)
 
 	if err != nil {
 		log.Fatal(err)
@@ -44,10 +41,22 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	// Respond to messages
+	command := commandCondition{
+		userCommand: message.Content,
+	} 
+
 	switch {
-		case strings.Contains(message.Content, "weather"):
-			discord.ChannelMessageSend(message.ChannelID, "I can help with that!")
-		case strings.Contains(message.Content, "bot"):
+		case command.isGreetCommand():
 			discord.ChannelMessageSend(message.ChannelID, "Hi there! I am a weather bot")
+		case command.isCityWeatherCommand():
+			
+			city, parseErr := parseCity(command.userCommand)
+
+			if(parseErr != nil) {
+				discord.ChannelMessageSend(message.ChannelID, parseErr.Error())
+			}
+
+			currentWeather := getCurrentWeatherFromCityName(city)
+			discord.ChannelMessageSendComplex(message.ChannelID, currentWeather)
 	}
 }

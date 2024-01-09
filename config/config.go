@@ -11,7 +11,7 @@ type Config struct {
 	WeatherToken string
 }
 
-func New() (config Config) {
+func new() (config Config) {
 	err := godotenv.Load()
 
 	if(err != nil) {
@@ -23,3 +23,6 @@ func New() (config Config) {
 		WeatherToken: os.Getenv("WEATHER_API_KEY"),
 	}
 }
+
+
+var AppConfig Config = new()
