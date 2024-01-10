@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
@@ -12,11 +11,7 @@ type Config struct {
 }
 
 func new() (config Config) {
-	err := godotenv.Load()
-
-	if(err != nil) {
-		log.Fatal(err)
-	}
+	godotenv.Load()
 
 	return Config {
 		BotToken: "Bot " + os.Getenv("DISCORD_BOT_TOKEN"),
